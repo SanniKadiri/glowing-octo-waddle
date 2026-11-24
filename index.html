@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Action Review</title>
+<style id="page-style"></style>
+</head>
+<body>
+<div id="app">
+<header class="nav bar"><div class="bar-inner"><div class="nav-brand brand"><span class="mark" aria-hidden="true">✓</span>Action Review</div><div class="buttons"><button class="btn btn-secondary" id="storage-button">Storage</button><button class="btn btn-secondary" id="backup-button">Backup</button><button class="btn btn-primary" id="new-action"><span>New action</span></button></div></div></header>
+<main class="wrap">
+<h1>Action register</h1><p class="subtitle">Review commitments, ownership and follow-up across your teams.</p>
+<div class="metrics" aria-label="Filter by status">
+<button class="btn btn-secondary metric" data-filter="Open">Open actions<strong id="open-count">0</strong></button>
+<button class="btn btn-secondary metric" data-filter="overdue">Overdue<strong id="overdue-count">0</strong></button>
+<button class="btn btn-secondary metric" data-filter="Closed">Closed<strong id="closed-count">0</strong></button>
+</div>
+<section class="panel" id="register" aria-label="Action register">
+<div class="toolbar">
+<input class="input" type="search" id="search" aria-label="Search actions" placeholder="Search actions…">
+<select class="input" id="team" aria-label="Filter by team"></select>
+<select class="input" id="owner" aria-label="Filter by owner"></select>
+<select class="input" id="status" aria-label="Filter by status"><option value="">All statuses</option><option selected>Open</option><option>Closed</option><option value="overdue">Overdue</option></select>
+<button class="btn btn-secondary" id="reload-button">Reload</button><button class="btn btn-secondary" id="export-button">Export</button>
+</div>
+<div class="scroll" tabindex="0" aria-label="Actions table"><table class="table"><thead><tr><th scope="col">Action</th><th scope="col">Team</th><th scope="col">Owner</th><th scope="col">Due date</th><th scope="col">Status</th></tr></thead><tbody></tbody></table></div>
+<div class="empty" id="empty" hidden></div><div class="count" id="visible-count" aria-live="polite"></div>
+</section>
+<p id="feedback" role="status"></p>
+</main>
+</div>
+<main id="report" class="wrap" hidden>
+<div class="report-tools"><button class="btn btn-secondary" id="back">Back to register</button><div class="buttons"><button class="btn btn-secondary" id="print">Print</button><button class="btn btn-primary" id="save-pdf">Download PDF</button></div></div>
+<p id="report-error" role="alert"></p><article class="report-paper" id="report-paper"></article>
+</main>
+<dialog class="dialog" id="editor" aria-labelledby="editor-title">
+<div class="dialog-head"><h2 id="editor-title">New action</h2><button class="btn btn-secondary" type="button" data-dismiss aria-label="Close editor">×</button></div>
+<form id="action-form">
+<div class="editor-fields">
+<div class="fields">
+<label class="wide">Action name<input class="input" name="title" maxlength="160" required></label>
+<label>Team<input class="input" name="team" maxlength="100" required></label>
+<label>Owner<input class="input" name="owner" maxlength="100" required></label>
+<label>Date raised<input class="input" name="raised" type="date" required></label>
+<label>Due date<input class="input" name="due" type="date"></label>
+<label>Status<select class="input" name="status"><option>Open</option><option>Closed</option></select></label>
+<p class="note" id="closure"></p>
+<label class="wide">Issue or context<textarea class="input" name="issue" rows="2" maxlength="4000"></textarea></label>
+<label class="wide">Latest comment<textarea class="input" name="comment" rows="2" maxlength="4000"></textarea></label>
+</div>
+<fieldset><legend>RACI</legend><div class="fields">
+<label>Responsible<input class="input" name="responsible" maxlength="200" placeholder="Defaults to owner"></label>
+<label>Accountable<input class="input" name="accountable" maxlength="200"></label>
+<label>Consulted<input class="input" name="consulted" maxlength="300"></label>
+<label>Informed<input class="input" name="informed" maxlength="300"></label>
+</div></fieldset>
+<p class="dialog-error" id="editor-error" role="alert"></p>
+</div>
+<div class="form-footer"><button class="btn btn-secondary" type="button" data-dismiss>Cancel</button><button class="btn btn-primary">Save action</button></div>
+</form>
+</dialog>
+<dialog class="dialog" id="exports" aria-labelledby="export-title">
+<div class="dialog-head"><h2 id="export-title">Export report</h2><button class="btn btn-secondary" data-dismiss aria-label="Close export">×</button></div>
+<form id="export-form">
+<div class="fields">
+<label class="wide">Report title<input class="input" id="report-title" value="Action Review" maxlength="120" required></label>
+<label>Review date<input class="input" id="review-date" type="date" required></label>
+<label>Include<select class="input" id="scope"><option value="filtered">Current view</option><option value="all">Full register</option></select></label>
+<label>Page orientation<select class="input" id="orientation"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label>
+</div>
+<p class="note" id="export-count"></p>
+<p class="dialog-error" id="export-error" role="alert"></p>
+<div class="form-footer"><button class="btn btn-secondary" type="submit" value="excel">Download Excel</button><button class="btn btn-secondary" type="submit" value="pdf">Download PDF</button><button class="btn btn-primary" type="submit" value="preview">Preview report</button></div>
+</form>
+</dialog>
+<dialog class="dialog" id="backup" aria-labelledby="backup-title">
+<div class="dialog-head"><h2 id="backup-title">Backup and restore</h2><button class="btn btn-secondary" data-dismiss aria-label="Close backup">×</button></div>
+<p class="note">Download a copy of the connected register or import a backup from another installation. Restoring replaces the connected register.</p>
+<div class="fields"><label class="wide">Choose a backup file<input class="input" id="backup-file" type="file" accept=".json,application/json"></label></div>
+<p class="dialog-error" id="backup-error" role="alert"></p>
+<div class="form-footer"><button class="btn btn-secondary" id="restore" disabled>Restore backup</button><button class="btn btn-primary" id="download-backup">Download backup</button></div>
+</dialog>
+<dialog class="dialog" id="storage" aria-labelledby="storage-title">
+<div class="dialog-head"><h2 id="storage-title">Storage</h2><button class="btn btn-ghost" data-dismiss aria-label="Close storage">×</button></div>
+<p class="note" id="storage-description"></p>
+<form id="storage-form">
+<div class="fields">
+<label class="wide" id="mode-field" hidden>Storage mode<select class="input" id="mode"><option value="local">Local SQLite</option><option value="remote">Remote server</option></select></label>
+<label class="wide" id="server-field" hidden>Server URL<input class="input" id="server" type="url" placeholder="https://review.example.com"></label>
+<label class="wide" id="key-field">Server access key<input class="input" id="access-key" type="password" autocomplete="off"></label>
+</div>
+<p class="dialog-error" id="storage-error" role="alert"></p>
+<div class="form-footer"><button class="btn btn-primary">Connect</button></div>
+</form>
+</dialog>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
